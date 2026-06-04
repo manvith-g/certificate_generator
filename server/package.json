@@ -1,0 +1,30 @@
+{
+  "name": "certificate-generator-server",
+  "version": "1.0.0",
+  "description": "Certificate Generator Backend",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "canvas": "^3.2.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1",
+    "multer": "^2.1.1",
+    "papaparse": "^5.5.3",
+    "pdf-lib": "^1.17.1",
+    "uuid": "^14.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
