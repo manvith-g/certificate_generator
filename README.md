@@ -1,12 +1,12 @@
-# CertGen: Full Project Walkthrough
+# Valora: Full Project Walkthrough
 
-Welcome to the comprehensive walkthrough of the **CertGen (Certificate Generator)** project. This document details the end-to-end architecture, user flows, database/state design, canvas editing setup, and server-side rendering pipeline.
+Welcome to the comprehensive walkthrough of the **Valora (Certificate Generator)** project. This document details the end-to-end architecture, user flows, database/state design, canvas editing setup, and server-side rendering pipeline.
 
 ---
 
 ## 🏗️ Architecture Overview
 
-CertGen is structured as a modern full-stack web application consisting of a React client powered by Fabric.js and a Node.js/Express server performing bulk rendering and ZIP streaming.
+Valora is structured as a modern full-stack web application consisting of a React client powered by Fabric.js and a Node.js/Express server performing bulk rendering and ZIP streaming.
 
 ```mermaid
 graph TD
