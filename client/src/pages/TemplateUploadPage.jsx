@@ -38,96 +38,143 @@ export default function TemplateUploadPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 pt-14 pb-10">
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '56px 16px 40px',
+      background: 'var(--bg-primary)',
+      transition: 'background-color 0.35s ease',
+    }}>
       <div className="w-full max-w-lg animate-fade-in-up">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-accent-600/10 border border-accent-500/20 flex items-center justify-center mx-auto mb-5">
-            <HiOutlinePhotograph className="text-2xl text-accent-400" />
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: 16,
+            background: 'var(--accent-muted)',
+            border: '1px solid var(--accent-border)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 20px',
+          }}>
+            <HiOutlinePhotograph style={{ fontSize: 24, color: 'var(--accent-primary)' }} />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+          <h1 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '1.875rem',
+            fontWeight: 700,
+            color: 'var(--text-primary)',
+            marginBottom: 8,
+          }}>
             Upload Template
           </h1>
-          <p className="text-dark-300 text-sm leading-relaxed">
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.5 }}>
             Upload your certificate background image to begin
           </p>
         </div>
 
         {/* Card */}
-        <form onSubmit={handleSubmit} className="glass-card p-6 space-y-5">
-          
-          {!file ? (
-            /* ── Dropzone: no file selected ── */
-            <div
-              className={`dropzone ${isDragging ? 'dragging' : ''}`}
-              onDragEnter={(e) => { e.preventDefault(); setIsDragging(true); }}
-              onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault(); setIsDragging(false);
-                const f = e.dataTransfer.files?.[0];
-                if (f) handleFile(f);
-              }}
-              onClick={() => document.getElementById('template-file-input')?.click()}
-            >
-              <input
-                id="template-file-input"
-                type="file"
-                accept=".png,.jpg,.jpeg"
-                onChange={(e) => handleFile(e.target.files?.[0])}
-                className="hidden"
-              />
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-16 h-16 rounded-2xl bg-dark-700 border border-dashed border-dark-500 flex items-center justify-center">
-                  <HiOutlineCloudUpload className="text-3xl text-dark-300" />
-                </div>
-                <div className="text-center">
-                  <p className="text-dark-100 font-medium">Drop your certificate template here</p>
-                  <p className="text-dark-400 text-sm mt-1">PNG or JPG — up to 20 MB</p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            /* ── File selected: compact preview ── */
-            <div className="rounded-xl overflow-hidden border border-dark-600 bg-dark-900">
-              {/* File info bar */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-dark-600">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-accent-600/10 flex items-center justify-center shrink-0">
-                    <HiOutlinePhotograph className="text-accent-400" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-white text-sm font-medium truncate">{file.name}</p>
-                    <p className="text-dark-400 text-xs">{formatSize(file.size)}</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setFile(null)}
-                  className="w-7 h-7 rounded-lg bg-dark-700 flex items-center justify-center text-dark-300 
-                             hover:text-rose-400 hover:bg-rose-500/10 transition-colors shrink-0"
-                >
-                  <HiX className="text-sm" />
-                </button>
-              </div>
-              {/* Image preview */}
-              {previewUrl && (
-                <img
-                  src={previewUrl}
-                  alt="Template preview"
-                  className="w-full max-h-[280px] object-contain p-4"
+        <form onSubmit={handleSubmit} className="glass-card" style={{ padding: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {!file ? (
+              /* ── Dropzone: no file selected ── */
+              <div
+                className={`dropzone ${isDragging ? 'dragging' : ''}`}
+                onDragEnter={(e) => { e.preventDefault(); setIsDragging(true); }}
+                onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault(); setIsDragging(false);
+                  const f = e.dataTransfer.files?.[0];
+                  if (f) handleFile(f);
+                }}
+                onClick={() => document.getElementById('template-file-input')?.click()}
+              >
+                <input
+                  id="template-file-input"
+                  type="file"
+                  accept=".png,.jpg,.jpeg"
+                  onChange={(e) => handleFile(e.target.files?.[0])}
+                  className="hidden"
                 />
-              )}
-            </div>
-          )}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 64, height: 64, borderRadius: 16,
+                    background: 'var(--bg-elevated)',
+                    border: '1px dashed var(--border-hover)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <HiOutlineCloudUpload style={{ fontSize: 28, color: 'var(--text-muted)' }} />
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ color: 'var(--text-primary)', fontWeight: 500 }}>Drop your certificate template here</p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: 4 }}>PNG or JPG — up to 20 MB</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* ── File selected: compact preview ── */
+              <div style={{
+                borderRadius: 12, overflow: 'hidden',
+                border: '1px solid var(--border-primary)',
+                background: 'var(--bg-secondary)',
+                transition: 'all 0.3s ease',
+              }}>
+                {/* File info bar */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '12px 16px',
+                  borderBottom: '1px solid var(--border-primary)',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: 8,
+                      background: 'var(--accent-muted)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                    }}>
+                      <HiOutlinePhotograph style={{ color: 'var(--accent-primary)' }} />
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ color: 'var(--text-primary)', fontSize: '0.875rem', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{formatSize(file.size)}</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFile(null)}
+                    style={{
+                      width: 28, height: 28, borderRadius: 8,
+                      background: 'var(--bg-elevated)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: 'var(--text-muted)', border: 'none', cursor: 'pointer',
+                      transition: 'all 0.2s ease', flexShrink: 0,
+                    }}
+                    onMouseOver={e => { e.currentTarget.style.color = '#f43f5e'; e.currentTarget.style.background = 'rgba(244,63,94,0.1)'; }}
+                    onMouseOut={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'var(--bg-elevated)'; }}
+                  >
+                    <HiX style={{ fontSize: 14 }} />
+                  </button>
+                </div>
+                {/* Image preview */}
+                {previewUrl && (
+                  <img
+                    src={previewUrl}
+                    alt="Template preview"
+                    style={{ width: '100%', maxHeight: 280, objectFit: 'contain', padding: 16 }}
+                  />
+                )}
+              </div>
+            )}
 
-          <button
-            type="submit"
-            disabled={!file}
-            className="btn-primary w-full py-3.5"
-          >
-            Continue to Editor <HiArrowRight />
-          </button>
+            <button
+              type="submit"
+              disabled={!file}
+              className="btn-primary"
+              style={{ width: '100%', padding: '14px 24px' }}
+            >
+              Continue to Editor <HiArrowRight />
+            </button>
+          </div>
         </form>
       </div>
     </div>

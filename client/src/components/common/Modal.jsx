@@ -15,23 +15,56 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      style={{
+        position: 'fixed', inset: 0, zIndex: 100,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 16,
+      }}
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'var(--overlay-bg)',
+        backdropFilter: 'blur(4px)',
+        WebkitBackdropFilter: 'blur(4px)',
+      }} />
       
       {/* Modal */}
       <div
-        className={`relative ${maxWidth} w-full bg-dark-800 border border-dark-600 rounded-2xl p-6 animate-fade-in-up max-h-[90vh] overflow-y-auto`}
+        className={`${maxWidth} animate-fade-in-up`}
+        style={{
+          position: 'relative',
+          width: '100%',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-primary)',
+          borderRadius: 16,
+          padding: 24,
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+          transition: 'background-color 0.3s ease, border-color 0.3s ease',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-semibold text-white" style={{ fontFamily: 'var(--font-display)' }}>{title}</h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '1.125rem',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+          }}>{title}</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-dark-700 flex items-center justify-center text-dark-300 
-                       hover:text-white hover:bg-dark-600 transition-colors"
+            style={{
+              width: 32, height: 32, borderRadius: 8,
+              background: 'var(--bg-elevated)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'var(--text-muted)', border: 'none', cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseOver={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.background = 'var(--bg-hover)'; }}
+            onMouseOut={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'var(--bg-elevated)'; }}
           >
             <HiX />
           </button>

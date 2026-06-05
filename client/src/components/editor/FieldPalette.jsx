@@ -12,28 +12,67 @@ const PREDEFINED_FIELDS = [
 export default function FieldPalette({ onAddField, onAddCustomField }) {
   return (
     <div>
-      <h3 className="text-xs font-semibold text-dark-300 uppercase tracking-wider mb-3">Dynamic Fields</h3>
+      <h3 style={{
+        fontSize: '0.75rem', fontWeight: 600,
+        color: 'var(--text-muted)',
+        textTransform: 'uppercase', letterSpacing: 1,
+        marginBottom: 12,
+      }}>
+        Dynamic Fields
+      </h3>
       
-      <div className="space-y-1">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {PREDEFINED_FIELDS.map((field) => (
           <button
             key={field.key}
             onClick={() => onAddField(field.name, field.key)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left
-                       hover:bg-dark-700 text-dark-200 hover:text-white transition-colors group"
+            style={{
+              width: '100%',
+              display: 'flex', alignItems: 'center', gap: 12,
+              padding: '10px 12px', borderRadius: 8,
+              fontSize: '0.875rem', textAlign: 'left',
+              background: 'transparent',
+              color: 'var(--text-secondary)',
+              border: 'none', cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseOver={e => {
+              e.currentTarget.style.background = 'var(--bg-elevated)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
           >
             <span>{field.icon}</span>
-            <span className="flex-1 font-medium">{field.name}</span>
-            <HiOutlinePlus className="text-dark-500 group-hover:text-accent-400 transition-colors" />
+            <span style={{ flex: 1, fontWeight: 500 }}>{field.name}</span>
+            <HiOutlinePlus style={{ color: 'var(--text-muted)', transition: 'color 0.2s ease' }} />
           </button>
         ))}
       </div>
 
       <button
         onClick={onAddCustomField}
-        className="mt-2 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm
-                   border border-dashed border-dark-500 hover:border-accent-500/50 
-                   text-dark-300 hover:text-accent-400 transition-colors"
+        style={{
+          marginTop: 8, width: '100%',
+          display: 'flex', alignItems: 'center', gap: 12,
+          padding: '10px 12px', borderRadius: 8,
+          fontSize: '0.875rem',
+          border: '1px dashed var(--border-hover)',
+          background: 'transparent',
+          color: 'var(--text-muted)',
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+        }}
+        onMouseOver={e => {
+          e.currentTarget.style.borderColor = 'var(--accent-border)';
+          e.currentTarget.style.color = 'var(--accent-primary)';
+        }}
+        onMouseOut={e => {
+          e.currentTarget.style.borderColor = 'var(--border-hover)';
+          e.currentTarget.style.color = 'var(--text-muted)';
+        }}
       >
         <HiOutlineTag />
         <span>Add Custom Field</span>

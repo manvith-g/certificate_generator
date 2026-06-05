@@ -13,9 +13,9 @@ export default function TextProperties({ onUpdate, onRemove }) {
 
   if (!field) {
     return (
-      <div className="text-center py-8">
-        <p className="text-dark-400 text-sm">Select a field on the canvas</p>
-        <p className="text-dark-500 text-xs mt-1">to edit its properties</p>
+      <div style={{ textAlign: 'center', padding: '32px 0' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Select a field on the canvas</p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: 4, opacity: 0.7 }}>to edit its properties</p>
       </div>
     );
   }
@@ -24,29 +24,56 @@ export default function TextProperties({ onUpdate, onRemove }) {
     onUpdate(selectedFieldId, { [key]: value });
   };
 
+  const toggleBtnStyle = (isActive) => ({
+    flex: 1,
+    padding: '8px 0',
+    borderRadius: 8,
+    fontSize: '0.875rem',
+    fontWeight: isActive ? 700 : 500,
+    fontStyle: 'normal',
+    transition: 'all 0.2s ease',
+    border: '1px solid',
+    background: isActive ? 'var(--accent-muted)' : 'var(--bg-elevated)',
+    color: isActive ? 'var(--accent-text)' : 'var(--text-muted)',
+    borderColor: isActive ? 'var(--accent-border)' : 'var(--border-primary)',
+    cursor: 'pointer',
+  });
+
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-dark-300 uppercase tracking-wider">Properties</h3>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h3 style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>Properties</h3>
         <button
           onClick={() => onRemove(selectedFieldId)}
-          className="w-7 h-7 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-400 
-                     hover:bg-rose-500/20 transition-colors"
+          style={{
+            width: 28, height: 28, borderRadius: 8,
+            background: 'rgba(244, 63, 94, 0.1)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fb7185', border: 'none', cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseOver={e => e.currentTarget.style.background = 'rgba(244, 63, 94, 0.2)'}
+          onMouseOut={e => e.currentTarget.style.background = 'rgba(244, 63, 94, 0.1)'}
           title="Remove field"
         >
-          <HiOutlineTrash className="text-sm" />
+          <HiOutlineTrash style={{ fontSize: 14 }} />
         </button>
       </div>
 
       {/* Field Info */}
-      <div className="bg-dark-700 rounded-lg p-3 border border-dark-600">
-        <p className="text-white text-sm font-medium">{field.field_name}</p>
-        <p className="text-accent-400 text-xs mt-0.5">Key: {field.field_key}</p>
+      <div style={{
+        background: 'var(--bg-elevated)',
+        borderRadius: 8, padding: 12,
+        border: '1px solid var(--border-primary)',
+        transition: 'all 0.3s ease',
+      }}>
+        <p style={{ color: 'var(--text-primary)', fontSize: '0.875rem', fontWeight: 500 }}>{field.field_name}</p>
+        <p style={{ color: 'var(--accent-primary)', fontSize: '0.75rem', marginTop: 2 }}>Key: {field.field_key}</p>
       </div>
 
       {/* Font Family */}
       <div>
-        <label className="text-xs text-dark-300 font-medium block mb-1.5">Font Family</label>
+        <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500, display: 'block', marginBottom: 6 }}>Font Family</label>
         <select
           value={field.font_family || 'Inter'}
           onChange={(e) => handleChange('font_family', e.target.value)}
@@ -60,57 +87,50 @@ export default function TextProperties({ onUpdate, onRemove }) {
 
       {/* Font Size */}
       <div>
-        <label className="text-xs text-dark-300 font-medium block mb-1.5">
-          Font Size: <span className="text-dark-100">{field.font_size || 32}px</span>
+        <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500, display: 'block', marginBottom: 6 }}>
+          Font Size: <span style={{ color: 'var(--text-primary)' }}>{field.font_size || 32}px</span>
         </label>
         <input
           type="range" min={8} max={120}
           value={field.font_size || 32}
           onChange={(e) => handleChange('font_size', parseInt(e.target.value))}
-          className="w-full"
+          style={{ width: '100%' }}
         />
       </div>
 
       {/* Color */}
       <div>
-        <label className="text-xs text-dark-300 font-medium block mb-1.5">Text Color</label>
-        <div className="flex items-center gap-2">
+        <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500, display: 'block', marginBottom: 6 }}>Text Color</label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <input
             type="color"
             value={field.font_color || '#000000'}
             onChange={(e) => handleChange('font_color', e.target.value)}
-            className="w-10 h-10 rounded-lg cursor-pointer"
+            style={{ width: 40, height: 40, borderRadius: 8, cursor: 'pointer' }}
           />
           <input
             type="text"
             value={field.font_color || '#000000'}
             onChange={(e) => handleChange('font_color', e.target.value)}
-            className="input-dark flex-1"
+            className="input-dark"
+            style={{ flex: 1 }}
           />
         </div>
       </div>
 
       {/* Style Toggles */}
       <div>
-        <label className="text-xs text-dark-300 font-medium block mb-1.5">Style</label>
-        <div className="flex gap-2">
+        <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500, display: 'block', marginBottom: 6 }}>Style</label>
+        <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={() => handleChange('font_weight', field.font_weight === 'bold' ? 'normal' : 'bold')}
-            className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all border ${
-              field.font_weight === 'bold'
-                ? 'bg-accent-600/15 text-accent-300 border-accent-500/30'
-                : 'bg-dark-700 text-dark-300 border-dark-600 hover:border-dark-500'
-            }`}
+            style={{ ...toggleBtnStyle(field.font_weight === 'bold'), fontWeight: 700 }}
           >
             B
           </button>
           <button
             onClick={() => handleChange('font_style', field.font_style === 'italic' ? 'normal' : 'italic')}
-            className={`flex-1 py-2 rounded-lg text-sm italic transition-all border ${
-              field.font_style === 'italic'
-                ? 'bg-accent-600/15 text-accent-300 border-accent-500/30'
-                : 'bg-dark-700 text-dark-300 border-dark-600 hover:border-dark-500'
-            }`}
+            style={{ ...toggleBtnStyle(field.font_style === 'italic'), fontStyle: 'italic' }}
           >
             I
           </button>
@@ -119,17 +139,17 @@ export default function TextProperties({ onUpdate, onRemove }) {
 
       {/* Alignment */}
       <div>
-        <label className="text-xs text-dark-300 font-medium block mb-1.5">Alignment</label>
-        <div className="flex gap-2">
+        <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500, display: 'block', marginBottom: 6 }}>Alignment</label>
+        <div style={{ display: 'flex', gap: 8 }}>
           {['left', 'center', 'right'].map((align) => (
             <button
               key={align}
               onClick={() => handleChange('text_align', align)}
-              className={`flex-1 py-2 rounded-lg text-xs capitalize transition-all border ${
-                field.text_align === align
-                  ? 'bg-accent-600/15 text-accent-300 border-accent-500/30'
-                  : 'bg-dark-700 text-dark-300 border-dark-600 hover:border-dark-500'
-              }`}
+              style={{
+                ...toggleBtnStyle(field.text_align === align),
+                fontSize: '0.75rem',
+                textTransform: 'capitalize',
+              }}
             >
               {align}
             </button>
@@ -139,14 +159,14 @@ export default function TextProperties({ onUpdate, onRemove }) {
 
       {/* Letter Spacing */}
       <div>
-        <label className="text-xs text-dark-300 font-medium block mb-1.5">
-          Letter Spacing: <span className="text-dark-100">{field.letter_spacing || 0}</span>
+        <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500, display: 'block', marginBottom: 6 }}>
+          Letter Spacing: <span style={{ color: 'var(--text-primary)' }}>{field.letter_spacing || 0}</span>
         </label>
         <input
           type="range" min={-5} max={30} step={0.5}
           value={field.letter_spacing || 0}
           onChange={(e) => handleChange('letter_spacing', parseFloat(e.target.value))}
-          className="w-full"
+          style={{ width: '100%' }}
         />
       </div>
     </div>

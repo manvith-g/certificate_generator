@@ -1,8 +1,20 @@
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HiOutlineSparkles } from 'react-icons/hi';
+import { HiOutlineSparkles, HiSun, HiMoon, HiArrowRight } from 'react-icons/hi';
+import useThemeStore from '../../store/useThemeStore';
 
 export default function Navbar() {
   const location = useLocation();
+  const { theme, toggleTheme } = useThemeStore();
+  const [scrolled, setScrolled] = useState(false);
+
+  const isLanding = location.pathname === '/';
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const steps = [
     { path: '/upload', label: 'Upload', num: '1' },
@@ -11,55 +23,151 @@ export default function Navbar() {
   ];
 
   const currentIdx = steps.findIndex(s => location.pathname.startsWith(s.path));
+  const isToolPage = currentIdx >= 0;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-dark-950/95 backdrop-blur-lg border-b border-dark-700">
-      <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+      <div style={{
+        maxWidth: 1200,
+        margin: '0 auto',
+        padding: '0 24px',
+        height: 56,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
         {/* Logo */}
-        <Link to="/upload" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-accent-600 flex items-center justify-center
-                          group-hover:bg-accent-500 transition-colors">
-            <HiOutlineSparkles className="text-white text-sm" />
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <div style={{
+            width: 32, height: 32,
+            borderRadius: 10,
+            background: 'var(--accent-primary)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'background-color 0.25s ease, transform 0.25s ease',
+          }}
+            onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
+            onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <HiOutlineSparkles style={{ color: '#fff', fontSize: 15 }} />
           </div>
-          <span className="text-base font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-            <span className="text-white">Cert</span><span className="text-accent-400">Gen</span>
+          <span style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 16,
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
+          }}>
+            <span style={{ color: 'var(--text-primary)' }}>Cert</span>
+            <span style={{ color: 'var(--accent-primary)' }}>Gen</span>
           </span>
         </Link>
 
-        {/* Step Indicator */}
-        <div className="flex items-center gap-0.5">
-          {steps.map((step, i) => {
-            const isActive = i === currentIdx;
-            const isPast = currentIdx >= 0 && i < currentIdx;
-            return (
-              <div key={step.path} className="flex items-center">
-                {i > 0 && (
-                  <div className={`w-8 h-[2px] ${isPast ? 'bg-accent-500' : 'bg-dark-600'}`} />
-                )}
-                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                  isActive
-                    ? 'bg-accent-600/15 text-accent-300'
-                    : isPast
-                      ? 'text-accent-400'
-                      : 'text-dark-400'
-                }`}>
-                  <span className={`w-5 h-5 rounded-full text-xs font-semibold flex items-center justify-center ${
-                    isActive
-                      ? 'bg-accent-600 text-white'
+        {/* Center: Step Indicator (tool pages) or Nav Links (landing) */}
+        {isToolPage ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {steps.map((step, i) => {
+              const isActive = i === currentIdx;
+              const isPast = currentIdx >= 0 && i < currentIdx;
+              return (
+                <div key={step.path} style={{ display: 'flex', alignItems: 'center' }}>
+                  {i > 0 && (
+                    <div style={{
+                      width: 32, height: 2,
+                      background: isPast ? 'var(--accent-primary)' : 'var(--border-primary)',
+                      transition: 'background-color 0.3s ease',
+                    }} />
+                  )}
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '6px 12px', borderRadius: 8,
+                    fontSize: 13, fontWeight: 500,
+                    transition: 'all 0.25s ease',
+                    background: isActive ? 'var(--accent-muted)' : 'transparent',
+                    color: isActive
+                      ? 'var(--accent-text)'
                       : isPast
-                        ? 'bg-accent-600/30 text-accent-300'
-                        : 'bg-dark-600 text-dark-400'
-                  }`}>
-                    {step.num}
-                  </span>
-                  <span className="hidden sm:inline">{step.label}</span>
+                        ? 'var(--accent-primary)'
+                        : 'var(--text-muted)',
+                  }}>
+                    <span style={{
+                      width: 20, height: 20, borderRadius: '50%',
+                      fontSize: 11, fontWeight: 600,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: isActive
+                        ? 'var(--accent-primary)'
+                        : isPast
+                          ? 'var(--accent-muted)'
+                          : 'var(--bg-elevated)',
+                      color: isActive
+                        ? '#fff'
+                        : isPast
+                          ? 'var(--accent-text)'
+                          : 'var(--text-muted)',
+                      transition: 'all 0.25s ease',
+                    }}>
+                      {step.num}
+                    </span>
+                    <span className="hidden sm:inline">{step.label}</span>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        ) : isLanding ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+            <a
+              href="#features"
+              style={{
+                fontSize: 14, fontWeight: 500,
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                transition: 'color 0.2s ease',
+              }}
+              onMouseOver={e => e.currentTarget.style.color = 'var(--text-primary)'}
+              onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              Features
+            </a>
+            <a
+              href="#how-it-works"
+              style={{
+                fontSize: 14, fontWeight: 500,
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                transition: 'color 0.2s ease',
+              }}
+              onMouseOver={e => e.currentTarget.style.color = 'var(--text-primary)'}
+              onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              How It Works
+            </a>
+          </div>
+        ) : null}
 
-        <div className="w-24" />
+        {/* Right: Theme Toggle + CTA */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button
+            onClick={toggleTheme}
+            className="theme-toggle"
+            aria-label="Toggle theme"
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? (
+              <HiSun style={{ fontSize: 18 }} />
+            ) : (
+              <HiMoon style={{ fontSize: 18 }} />
+            )}
+          </button>
+
+          {isLanding && (
+            <Link
+              to="/upload"
+              className="btn-primary"
+              style={{ padding: '8px 18px', fontSize: 13, borderRadius: 10, gap: 6 }}
+            >
+              Get Started <HiArrowRight style={{ fontSize: 14 }} />
+            </Link>
+          )}
+        </div>
       </div>
     </nav>
   );

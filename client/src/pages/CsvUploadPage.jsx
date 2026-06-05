@@ -78,28 +78,49 @@ export default function CsvUploadPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 pt-14 pb-10">
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '56px 16px 40px',
+      background: 'var(--bg-primary)',
+      transition: 'background-color 0.35s ease',
+    }}>
       <div className="w-full max-w-lg animate-fade-in-up">
         {/* Back */}
         <button
           onClick={() => navigate('/editor')}
-          className="flex items-center gap-1.5 text-sm text-dark-300 hover:text-white mb-6 transition-colors"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            fontSize: '0.875rem', color: 'var(--text-muted)',
+            background: 'none', border: 'none', cursor: 'pointer',
+            marginBottom: 24, transition: 'color 0.2s ease',
+          }}
+          onMouseOver={e => e.currentTarget.style.color = 'var(--text-primary)'}
+          onMouseOut={e => e.currentTarget.style.color = 'var(--text-muted)'}
         >
           <HiOutlineArrowLeft /> Back to Editor
         </button>
 
-        <div className="glass-card p-6">
+        <div className="glass-card" style={{ padding: 24 }}>
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <h1 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              marginBottom: 8,
+            }}>
               Upload CSV & Generate
             </h1>
-            <p className="text-dark-300 text-sm">
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
               Upload participant data to generate all certificates at once
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <FileDropzone
               onFileSelect={setCsvFile}
               accept=".csv"
@@ -109,11 +130,29 @@ export default function CsvUploadPage() {
             />
 
             {/* Expected columns hint */}
-            <div className="bg-dark-900 rounded-xl p-4 border border-dark-600">
-              <p className="text-xs text-dark-300 font-medium uppercase tracking-wider mb-2">Expected CSV Columns</p>
-              <div className="flex flex-wrap gap-2">
+            <div style={{
+              background: 'var(--bg-secondary)',
+              borderRadius: 12,
+              padding: 16,
+              border: '1px solid var(--border-primary)',
+              transition: 'all 0.3s ease',
+            }}>
+              <p style={{
+                fontSize: '0.75rem', color: 'var(--text-muted)',
+                fontWeight: 500, textTransform: 'uppercase', letterSpacing: 1,
+                marginBottom: 8,
+              }}>
+                Expected CSV Columns
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {fields.map((f, i) => (
-                  <span key={i} className="text-xs px-2.5 py-1 rounded-lg bg-accent-600/10 text-accent-300 border border-accent-500/20 font-mono">
+                  <span key={i} style={{
+                    fontSize: '0.75rem', padding: '4px 10px', borderRadius: 8,
+                    background: 'var(--accent-muted)',
+                    color: 'var(--accent-text)',
+                    border: '1px solid var(--accent-border)',
+                    fontFamily: 'monospace',
+                  }}>
                     {f.field_key}
                   </span>
                 ))}
@@ -127,9 +166,13 @@ export default function CsvUploadPage() {
             <button
               onClick={handleGenerate}
               disabled={!csvFile || generating}
-              className="btn-primary w-full py-3.5 flex items-center justify-center gap-2"
+              className="btn-primary"
+              style={{
+                width: '100%', padding: '14px 24px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              }}
             >
-              <HiOutlineDocumentDownload className="text-lg" />
+              <HiOutlineDocumentDownload style={{ fontSize: 18 }} />
               {generating ? 'Processing...' : 'Generate & Download ZIP'}
             </button>
           </div>

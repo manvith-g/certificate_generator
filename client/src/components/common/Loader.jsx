@@ -8,18 +8,18 @@ export default function Loader({ size = 'md', text }) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-12">
       <div className={`${sizes[size]} spinner`} />
-      {text && <p className="text-dark-300 text-sm animate-pulse">{text}</p>}
+      {text && <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }} className="animate-pulse">{text}</p>}
     </div>
   );
 }
 
 export function ProgressBar({ progress, label }) {
   return (
-    <div className="w-full">
+    <div style={{ width: '100%' }}>
       {label && (
-        <div className="flex justify-between mb-2 text-sm">
-          <span className="text-dark-300">{label}</span>
-          <span className="text-accent-400 font-medium">{progress}%</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.875rem' }}>
+          <span style={{ color: 'var(--text-muted)' }}>{label}</span>
+          <span style={{ color: 'var(--accent-primary)', fontWeight: 500 }}>{progress}%</span>
         </div>
       )}
       <div className="progress-bar">

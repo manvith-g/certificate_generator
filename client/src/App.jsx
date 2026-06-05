@@ -1,18 +1,22 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/layout/Navbar';
+import LandingPage from './pages/LandingPage';
 import TemplateUploadPage from './pages/TemplateUploadPage';
 import EditorPage from './pages/EditorPage';
 import CsvUploadPage from './pages/CsvUploadPage';
+import useThemeStore from './store/useThemeStore';
 
 function App() {
+  const theme = useThemeStore((s) => s.theme);
+
   return (
     <Router>
-      <div className="min-h-screen bg-dark-950">
+      <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', transition: 'background-color 0.35s ease' }}>
         <Navbar />
         <main>
           <Routes>
-            <Route path="/" element={<Navigate to="/upload" replace />} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/upload" element={<TemplateUploadPage />} />
             <Route path="/editor" element={<EditorPage />} />
             <Route path="/csv" element={<CsvUploadPage />} />
@@ -23,15 +27,16 @@ function App() {
           toastOptions={{
             duration: 3000,
             style: {
-              background: '#18181b',
-              color: '#d4d4d8',
-              border: '1px solid #2c2c30',
+              background: 'var(--toast-bg)',
+              color: 'var(--toast-text)',
+              border: '1px solid var(--toast-border)',
               borderRadius: '12px',
               fontSize: '14px',
               padding: '12px 16px',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
             },
-            success: { iconTheme: { primary: '#34d399', secondary: '#09090b' } },
-            error: { iconTheme: { primary: '#f43f5e', secondary: '#09090b' } },
+            success: { iconTheme: { primary: '#34d399', secondary: theme === 'dark' ? '#09090b' : '#fff' } },
+            error: { iconTheme: { primary: '#f43f5e', secondary: theme === 'dark' ? '#09090b' : '#fff' } },
           }}
         />
       </div>
