@@ -2,19 +2,19 @@ import { create } from 'zustand';
 
 const getInitialTheme = () => {
   try {
-    const stored = localStorage.getItem('certgen-theme');
+    const stored = localStorage.getItem('velora-theme');
     if (stored === 'light' || stored === 'dark') return stored;
   } catch {}
   if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: light)').matches) {
-    return 'light';
+    return 'dark';
   }
-  return 'dark';
+  return 'light';
 };
 
 const applyTheme = (theme) => {
   document.documentElement.setAttribute('data-theme', theme);
   try {
-    localStorage.setItem('certgen-theme', theme);
+    localStorage.setItem('velora-theme', theme);
   } catch {}
 };
 

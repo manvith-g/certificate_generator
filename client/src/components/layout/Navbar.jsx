@@ -38,26 +38,14 @@ export default function Navbar() {
       }}>
         {/* Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <div style={{
-            width: 32, height: 32,
-            borderRadius: 10,
-            background: 'var(--accent-primary)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'background-color 0.25s ease, transform 0.25s ease',
-          }}
-            onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
-            onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
-          >
-            <HiOutlineSparkles style={{ color: '#fff', fontSize: 15 }} />
-          </div>
           <span style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 16,
+            fontSize: 22,
             fontWeight: 700,
-            letterSpacing: '-0.02em',
+            letterSpacing: '0.03m',
           }}>
-            <span style={{ color: 'var(--text-primary)' }}>Cert</span>
-            <span style={{ color: 'var(--accent-primary)' }}>Gen</span>
+            <span style={{ color: 'var(--text-primary)' }}>Vel</span>
+            <span style={{ color: 'var(--accent-primary)' }}>ora</span>
           </span>
         </Link>
 

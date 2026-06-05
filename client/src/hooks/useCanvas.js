@@ -50,6 +50,50 @@ export default function useCanvas(containerRef) {
       canvas.backgroundImage = img;
       canvas.renderAll();
       setCanvasReady(true);
+
+      // Restore any existing fields from the store (e.g. when returning via "Edit Again")
+      const existingFields = useEditorStore.getState().fields;
+      if (existingFields && existingFields.length > 0) {
+        const scale = scaleFactorRef.current;
+        const dims = templateDimsRef.current;
+
+        for (const field of existingFields) {
+          const text = new IText(`{{${field.field_key}}}`, {
+            left: field.x * dims.width * scale,
+            top: field.y * dims.height * scale,
+            originX: 'center',
+            originY: 'center',
+            fontFamily: field.font_family || 'Inter',
+            fontSize: Math.round((field.font_size || 32) * scale),
+            fill: field.font_color || '#000000',
+            fontWeight: field.font_weight || 'normal',
+            fontStyle: field.font_style || 'normal',
+            textAlign: field.text_align || 'center',
+            charSpacing: (field.letter_spacing || 0) * 10,
+            angle: field.rotation || 0,
+            editable: false,
+            cornerColor: '#7c3aed',
+            cornerStrokeColor: '#7c3aed',
+            borderColor: '#7c3aed',
+            cornerSize: 10,
+            transparentCorners: false,
+            borderScaleFactor: 2,
+          });
+
+          text.fieldId = field.id;
+          text.fieldName = field.field_name;
+          text.fieldKey = field.field_key;
+
+          canvas.add(text);
+
+          if (document.fonts) {
+            document.fonts.load(`${field.font_style || 'normal'} ${field.font_weight || 'normal'} 1em "${field.font_family || 'Inter'}"`)
+              .then(() => canvas.renderAll())
+              .catch(() => {});
+          }
+        }
+        canvas.renderAll();
+      }
     }).catch((err) => {
       console.error('Failed to load template image:', err);
     });
@@ -290,6 +334,7 @@ export default function useCanvas(containerRef) {
     return canvas.getObjects()
       .filter((o) => o.fieldId)
       .map((obj) => ({
+        id: obj.fieldId,
         field_name: obj.fieldName,
         field_key: obj.fieldKey,
         x: obj.left / (dims.width * scale),

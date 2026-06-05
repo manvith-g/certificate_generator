@@ -1,7 +1,7 @@
 {
-  "name": "certificate-generator-server",
+  "name": "velora-server",
   "version": "1.0.0",
-  "description": "Certificate Generator Backend",
+  "description": "Velora Certificate Generator Backend",
   "type": "module",
   "main": "server.js",
   "scripts": {

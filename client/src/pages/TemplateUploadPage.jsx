@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { HiOutlinePhotograph, HiArrowRight, HiOutlineCloudUpload, HiX } from 'react-icons/hi';
 import useTemplateStore from '../store/useTemplateStore';
+import useEditorStore from '../store/useEditorStore';
 
 export default function TemplateUploadPage() {
   const navigate = useNavigate();
@@ -22,6 +23,10 @@ export default function TemplateUploadPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!file) return toast.error('Please select a template file');
+
+    // Clear previous editor state when starting fresh with a new template
+    useEditorStore.getState().clearEditor();
+
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {

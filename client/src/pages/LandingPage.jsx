@@ -87,7 +87,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════
           HERO SECTION
           ═══════════════════════════════════════════ */}
-      <section className="hero-gradient" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 80 }}>
+      <section className="hero-gradient" style={{ position: 'relative',marginTop:'20px', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 80 }}>
         {/* Background dots */}
         <div className="hero-dots" />
 
@@ -97,7 +97,7 @@ export default function LandingPage() {
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
           {/* Badge */}
-          <motion.div
+          {/* <motion.div
             variants={fadeUp}
             initial="hidden"
             animate="visible"
@@ -106,9 +106,9 @@ export default function LandingPage() {
           >
             <HiOutlineSparkles style={{ color: 'var(--accent-primary)', fontSize: 16 }} />
             <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent-text)', letterSpacing: 0.3 }}>
-              Free & Open Source Certificate Generator
+              Free & Open Source Certificate Generator — Velora
             </span>
-          </motion.div>
+          </motion.div> */}
 
           {/* Headline */}
           <motion.h1
@@ -126,7 +126,7 @@ export default function LandingPage() {
               letterSpacing: '-0.02em',
             }}
           >
-            Generate Beautiful{' '}
+            Generate Dynamic{' '}
             <span style={{
               background: 'linear-gradient(135deg, #6366f1, #22d3ee, #a855f7)',
               backgroundSize: '200% 200%',
@@ -464,7 +464,7 @@ export default function LandingPage() {
         transition: 'background-color 0.35s ease, border-color 0.35s ease',
       }}>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-          Built with ❤️ — CertGen © {new Date().getFullYear()}
+          Built with ❤️ — Velora © {new Date().getFullYear()}
         </p>
       </footer>
     </div>

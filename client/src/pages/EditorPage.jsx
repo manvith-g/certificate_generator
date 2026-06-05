@@ -13,11 +13,11 @@ import toast from 'react-hot-toast';
 export default function EditorPage() {
   const navigate = useNavigate();
   const containerRef = useRef(null);
-  
+
   const { templateUrl, templateWidth, templateHeight } = useTemplateStore();
   const { isDirty, clearEditor } = useEditorStore();
   const canvasHook = useCanvas(containerRef);
-  
+
   const [customFieldModal, setCustomFieldModal] = useState(false);
   const [customFieldName, setCustomFieldName] = useState('');
   const [customFieldKey, setCustomFieldKey] = useState('');
@@ -25,10 +25,6 @@ export default function EditorPage() {
   if (!templateUrl) {
     return <Navigate to="/upload" replace />;
   }
-
-  useEffect(() => {
-    clearEditor();
-  }, []);
 
   const handleAddField = (name, key) => {
     canvasHook.addTextField(name, key);
@@ -64,10 +60,10 @@ export default function EditorPage() {
         This ensures nothing gets clipped or hidden.
       */}
       <div style={{ position: 'fixed', top: 56, left: 0, right: 0, bottom: 0, display: 'flex' }}>
-        
+
         {/* ═══ LEFT SIDEBAR ═══ */}
         <div className="editor-sidebar" style={{ width: 280, minWidth: 280, display: 'flex', flexDirection: 'column' }}>
-          
+
           {/* Sidebar Header */}
           <div style={{
             padding: '14px 20px',
@@ -106,7 +102,7 @@ export default function EditorPage() {
 
         {/* ═══ MAIN CONTENT AREA ═══ */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-          
+
           {/* TOP TOOLBAR — always visible */}
           <div className="editor-toolbar" style={{
             flexShrink: 0,
@@ -140,7 +136,7 @@ export default function EditorPage() {
           </div>
 
           {/* CANVAS AREA */}
-          <div 
+          <div
             ref={containerRef}
             className="editor-canvas-area"
             style={{
