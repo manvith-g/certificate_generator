@@ -18,6 +18,8 @@ import useTemplateStore from '../store/useTemplateStore';
 import useEditorStore from '../store/useEditorStore';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 export default function CsvUploadPage() {
   const navigate = useNavigate();
   const [csvFile, setCsvFile] = useState(null);
@@ -108,7 +110,7 @@ export default function CsvUploadPage() {
 
       setProgress(40);
 
-      const response = await axios.post('http://localhost:5000/api/generate', formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/generate`, formData, {
         responseType: 'blob',
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
