@@ -17,8 +17,30 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 app.use(helmet({ crossOriginResourcePolicy: false }));
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+  : [
+      'http://localhost:5173',
+      'https://certificate-generator-gules.vercel.app'
+    ];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+    if (!origin) return callback(null, true);
+
+    const originNormalized = origin.replace(/\/$/, '');
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (allowed === '*') return true;
+      return allowed.replace(/\/$/, '') === originNormalized;
+    });
+
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
   credentials: true,
 }));
 app.use(morgan('dev'));
@@ -53,4 +75,5 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
