@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { HiArrowRight } from 'react-icons/hi';
+import { HiArrowRight, HiOutlineAdjustments, HiX } from 'react-icons/hi';
 import useTemplateStore from '../store/useTemplateStore';
 import useEditorStore from '../store/useEditorStore';
 import useCanvas from '../hooks/useCanvas';
@@ -18,6 +18,7 @@ export default function EditorPage() {
   const { isDirty, clearEditor } = useEditorStore();
   const canvasHook = useCanvas(containerRef);
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [customFieldModal, setCustomFieldModal] = useState(false);
   const [customFieldName, setCustomFieldName] = useState('');
   const [customFieldKey, setCustomFieldKey] = useState('');
@@ -28,6 +29,7 @@ export default function EditorPage() {
 
   const handleAddField = (name, key) => {
     canvasHook.addTextField(name, key);
+    setSidebarOpen(false);
   };
 
   const handleAddCustomField = () => {
@@ -39,6 +41,7 @@ export default function EditorPage() {
     setCustomFieldModal(false);
     setCustomFieldName('');
     setCustomFieldKey('');
+    setSidebarOpen(false);
   };
 
   const handleNext = () => {
@@ -59,10 +62,28 @@ export default function EditorPage() {
         We use a fixed position layout below the navbar (top: 56px = h-14).
         This ensures nothing gets clipped or hidden.
       */}
-      <div style={{ position: 'fixed', top: 56, left: 0, right: 0, bottom: 0, display: 'flex' }}>
+      <div style={{ position: 'fixed', top: 56, left: 0, right: 0, bottom: 0, display: 'flex', width: '100%' }}>
 
-        {/* ═══ LEFT SIDEBAR ═══ */}
-        <div className="editor-sidebar" style={{ width: 280, minWidth: 280, display: 'flex', flexDirection: 'column' }}>
+        {/* ═══ MOBILE BACKDROP OVERLAY ═══ */}
+        {sidebarOpen && (
+          <div
+            className="md:hidden"
+            onClick={() => setSidebarOpen(false)}
+            style={{
+              position: 'fixed',
+              top: 56,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'var(--overlay-bg)',
+              backdropFilter: 'blur(4px)',
+              zIndex: 35,
+            }}
+          />
+        )}
+
+        {/* ═══ LEFT SIDEBAR (DRAWER ON MOBILE) ═══ */}
+        <div className={`editor-sidebar-container ${sidebarOpen ? 'open' : ''}`}>
 
           {/* Sidebar Header */}
           <div style={{
@@ -104,34 +125,54 @@ export default function EditorPage() {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
 
           {/* TOP TOOLBAR — always visible */}
-          <div className="editor-toolbar" style={{
+          <div className="editor-toolbar px-4 sm:px-6" style={{
             flexShrink: 0,
             height: 56,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0 24px',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ color: 'var(--text-primary)', fontSize: 15, fontWeight: 600 }}>Certificate Editor</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {/* Toggle Sidebar Button for Mobile */}
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="md:hidden flex items-center justify-center"
+                style={{
+                  width: 36, height: 36, borderRadius: 8,
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-primary)',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  flexShrink: 0,
+                }}
+                title="Toggle properties"
+              >
+                {sidebarOpen ? <HiX style={{ fontSize: 18 }} /> : <HiOutlineAdjustments style={{ fontSize: 18 }} />}
+              </button>
+
+              <span style={{ color: 'var(--text-primary)', fontSize: 14, fontWeight: 600 }}>Editor</span>
               {isDirty && (
                 <span style={{
-                  fontSize: 11, padding: '3px 10px', borderRadius: 6,
+                  fontSize: 10, padding: '2px 6px', borderRadius: 4,
                   background: 'rgba(251, 191, 36, 0.1)', color: '#fbbf24',
-                  border: '1px solid rgba(251, 191, 36, 0.2)'
+                  border: '1px solid rgba(251, 191, 36, 0.2)',
+                  whiteSpace: 'nowrap',
                 }}>
-                  Unsaved changes
+                  Unsaved
                 </span>
               )}
             </div>
 
-            {/* GENERATE BUTTON — big and prominent */}
+            {/* GENERATE BUTTON — responsive text */}
             <button
               onClick={handleNext}
               className="btn-primary"
-              style={{ padding: '10px 24px', borderRadius: 10, fontSize: 14 }}
+              style={{ padding: '8px 18px', borderRadius: 10, fontSize: 13, gap: 6 }}
             >
-              Next: Upload CSV & Generate <HiArrowRight />
+              <span className="hidden sm:inline">Next: Upload CSV & Generate</span>
+              <span className="inline sm:hidden">Next</span>
+              <HiArrowRight style={{ fontSize: 14 }} />
             </button>
           </div>
 
@@ -145,7 +186,7 @@ export default function EditorPage() {
               alignItems: 'center',
               justifyContent: 'center',
               overflow: 'auto',
-              padding: 24,
+              padding: '16px 12px',
             }}
           >
             <CanvasEditor

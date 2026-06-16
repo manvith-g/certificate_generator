@@ -51,31 +51,34 @@ export default function Navbar() {
 
         {/* Center: Step Indicator (tool pages) or Nav Links (landing) */}
         {isToolPage ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <div className="flex items-center gap-1 sm:gap-2">
             {steps.map((step, i) => {
               const isActive = i === currentIdx;
               const isPast = currentIdx >= 0 && i < currentIdx;
               return (
                 <div key={step.path} style={{ display: 'flex', alignItems: 'center' }}>
                   {i > 0 && (
-                    <div style={{
-                      width: 32, height: 2,
-                      background: isPast ? 'var(--accent-primary)' : 'var(--border-primary)',
-                      transition: 'background-color 0.3s ease',
-                    }} />
+                    <div
+                      className="step-connector"
+                      style={{
+                        background: isPast ? 'var(--accent-primary)' : 'var(--border-primary)',
+                      }}
+                    />
                   )}
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: 6,
-                    padding: '6px 12px', borderRadius: 8,
-                    fontSize: 13, fontWeight: 500,
-                    transition: 'all 0.25s ease',
-                    background: isActive ? 'var(--accent-muted)' : 'transparent',
-                    color: isActive
-                      ? 'var(--accent-text)'
-                      : isPast
-                        ? 'var(--accent-primary)'
-                        : 'var(--text-muted)',
-                  }}>
+                  <div
+                    className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5"
+                    style={{
+                      borderRadius: 8,
+                      fontSize: 13, fontWeight: 500,
+                      transition: 'all 0.25s ease',
+                      background: isActive ? 'var(--accent-muted)' : 'transparent',
+                      color: isActive
+                        ? 'var(--accent-text)'
+                        : isPast
+                          ? 'var(--accent-primary)'
+                          : 'var(--text-muted)',
+                    }}
+                  >
                     <span style={{
                       width: 20, height: 20, borderRadius: '50%',
                       fontSize: 11, fontWeight: 600,
