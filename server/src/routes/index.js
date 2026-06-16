@@ -1,23 +1,29 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { generateCertificates } from '../controllers/generateController.js';
+import { generateCertificates, getProgress, downloadResult } from '../controllers/generateController.js';
 import { AVAILABLE_FONTS, PREDEFINED_FIELDS } from '../utils/constants.js';
 
 const router = Router();
 
-// Configure multer for memory storage or temp disk storage
-// Using disk storage because template and CSV might be large, but memory is fine for typical sizes.
-// We'll use memory storage for simplicity and speed, avoiding file system I/O if possible.
+// Configure multer for memory storage
+// Using memory storage for the initial upload — the batch processor
+// writes the output ZIP to disk to avoid holding everything in RAM.
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit per file
 });
 
-// Single endpoint that takes template (image/pdf), csv (file), and fields (json string)
+// Start generation job — accepts template + csv + fields
 router.post('/generate', upload.fields([
   { name: 'template', maxCount: 1 },
   { name: 'csv', maxCount: 1 }
 ]), generateCertificates);
+
+// Poll generation progress
+router.get('/generate/progress/:jobId', getProgress);
+
+// Download completed ZIP
+router.get('/generate/download/:jobId', downloadResult);
 
 // Utility endpoints for the editor
 router.get('/fonts', (req, res) => {

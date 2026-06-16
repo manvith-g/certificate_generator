@@ -13,17 +13,36 @@ export default function Loader({ size = 'md', text }) {
   );
 }
 
-export function ProgressBar({ progress, label }) {
+export function ProgressBar({ progress, label, sublabel }) {
+  const roundedProgress = Math.round(Math.min(progress, 100));
+
   return (
     <div style={{ width: '100%' }}>
       {label && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.875rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: '0.875rem' }}>
           <span style={{ color: 'var(--text-muted)' }}>{label}</span>
-          <span style={{ color: 'var(--accent-primary)', fontWeight: 500 }}>{progress}%</span>
+          <span style={{ color: 'var(--accent-primary)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{roundedProgress}%</span>
         </div>
       )}
+      {sublabel && (
+        <p style={{
+          color: 'var(--text-muted)',
+          fontSize: '0.75rem',
+          marginBottom: 8,
+          opacity: 0.8,
+          fontVariantNumeric: 'tabular-nums',
+        }}>
+          {sublabel}
+        </p>
+      )}
       <div className="progress-bar">
-        <div className="progress-bar-fill" style={{ width: `${Math.min(progress, 100)}%` }} />
+        <div
+          className="progress-bar-fill"
+          style={{
+            width: `${roundedProgress}%`,
+            transition: 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+        />
       </div>
     </div>
   );

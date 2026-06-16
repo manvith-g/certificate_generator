@@ -25,6 +25,8 @@ export default function CsvUploadPage() {
   const [csvFile, setCsvFile] = useState(null);
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState('');
+  const [progressSublabel, setProgressSublabel] = useState('');
   const [generationSuccess, setGenerationSuccess] = useState(false);
   const [downloadBlob, setDownloadBlob] = useState(null);
 
@@ -93,13 +95,15 @@ export default function CsvUploadPage() {
     }
 
     setGenerating(true);
-    setProgress(20);
+    setProgress(0);
+    setProgressLabel('Preparing upload...');
+    setProgressSublabel('');
 
     try {
+      // ── Phase 1: Upload (0% → 30%) ──
       const formData = new FormData();
       formData.append('template', templateFile);
 
-      // Use edited CSV data (reconstructed as a file)
       const csvBlob = buildCsvBlob();
       formData.append('csv', csvBlob, csvFile?.name || 'data.csv');
 
@@ -108,22 +112,71 @@ export default function CsvUploadPage() {
       formData.append('templateHeight', templateHeight);
       formData.append('format', 'png');
 
-      setProgress(40);
+      setProgressLabel('Uploading files...');
+      setProgressSublabel('Sending template and CSV to server');
 
-      const response = await axios.post(`${API_BASE_URL}/api/generate`, formData, {
-        responseType: 'blob',
+      const startResponse = await axios.post(`${API_BASE_URL}/api/generate`, formData, {
         onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setProgress(40 + (percentCompleted * 0.4));
-        }
+          const pct = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setProgress(Math.round(pct * 0.3)); // 0% → 30%
+          setProgressSublabel(`Uploading... ${Math.round(pct)}%`);
+        },
       });
 
-      setProgress(90);
+      const { jobId, totalRows } = startResponse.data;
 
-      const blob = new Blob([response.data], { type: 'application/zip' });
+      // ── Phase 2: Poll progress (30% → 90%) ──
+      setProgress(30);
+      setProgressLabel('Generating certificates...');
+      setProgressSublabel(`Starting... 0 of ${totalRows} certificates`);
+
+      await new Promise((resolve, reject) => {
+        const pollInterval = setInterval(async () => {
+          try {
+            const { data } = await axios.get(`${API_BASE_URL}/api/generate/progress/${jobId}`);
+
+            if (data.status === 'processing') {
+              const processingPct = data.total > 0 ? (data.completed / data.total) : 0;
+              setProgress(30 + Math.round(processingPct * 60)); // 30% → 90%
+              setProgressSublabel(`Processing certificate ${data.completed} of ${data.total}`);
+            } else if (data.status === 'done') {
+              clearInterval(pollInterval);
+              setProgress(90);
+              setProgressSublabel(`All ${data.total} certificates generated!`);
+              resolve();
+            } else if (data.status === 'error') {
+              clearInterval(pollInterval);
+              reject(new Error(data.error || 'Generation failed on server'));
+            }
+          } catch (pollErr) {
+            clearInterval(pollInterval);
+            reject(pollErr);
+          }
+        }, 500);
+      });
+
+      // ── Phase 3: Download (90% → 100%) ──
+      setProgressLabel('Downloading ZIP...');
+      setProgressSublabel('Fetching your certificates package');
+
+      const downloadResponse = await axios.get(`${API_BASE_URL}/api/generate/download/${jobId}`, {
+        responseType: 'blob',
+        onDownloadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const dlPct = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setProgress(90 + Math.round(dlPct * 0.1)); // 90% → 100%
+          }
+        },
+      });
+
+      setProgress(100);
+      setProgressLabel('Complete!');
+      setProgressSublabel('Your certificates are ready');
+
+      const blob = new Blob([downloadResponse.data], { type: 'application/zip' });
       setDownloadBlob(blob);
 
-      // Trigger initial download
+      // Trigger download
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -133,19 +186,19 @@ export default function CsvUploadPage() {
       link.remove();
       setTimeout(() => window.URL.revokeObjectURL(url), 100);
 
-      setProgress(100);
       toast.success('Certificates downloaded!');
-
-      // Show success completion screen
       setGenerationSuccess(true);
 
     } catch (err) {
       console.error(err);
-      toast.error('Failed to generate certificates');
+      const errorMsg = err.response?.data?.error || err.message || 'Failed to generate certificates';
+      toast.error(errorMsg);
     } finally {
       setTimeout(() => {
         setGenerating(false);
         setProgress(0);
+        setProgressLabel('');
+        setProgressSublabel('');
       }, 500);
     }
   };
@@ -184,7 +237,7 @@ export default function CsvUploadPage() {
       background: 'var(--bg-primary)',
       transition: 'background-color 0.35s ease',
     }}>
-      <div style={{ width: '100%', maxWidth: csvData && showPreview ? 900 : 480 , transition: 'max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }} className="animate-fade-in-up">
+      <div style={{ width: '100%', maxWidth: csvData && showPreview && !generating ? 900 : 480 , transition: 'max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }} className="animate-fade-in-up">
 
         {generationSuccess ? (
           /* ═══════════════════════════════════════════
@@ -314,6 +367,83 @@ export default function CsvUploadPage() {
                 </button>
               </div>
             </div>
+          </div>
+        ) : generating ? (
+          /* ═══════════════════════════════════════════
+              DEDICATED GENERATING PROGRESS LOADER SCREEN
+              ═══════════════════════════════════════════ */
+          <div className="glass-card" style={{ padding: '40px 32px', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            {/* Glow Effect */}
+            <div className="glow-circle" style={{ width: 200, height: 200, top: '10%', left: '30%', zIndex: 0 }} />
+
+            {/* Animated Icon Ring */}
+            <div style={{ position: 'relative', width: 96, height: 96, marginBottom: 28, zIndex: 1 }} className="animate-float">
+              {/* Outer rotating gradient ring */}
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: '50%',
+                padding: 3,
+                background: 'linear-gradient(135deg, var(--accent-primary), #22d3ee, #818cf8)',
+              }} className="animate-spin-slow">
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  background: 'var(--bg-secondary)',
+                }} />
+              </div>
+              
+              {/* Inner glowing center */}
+              <div style={{
+                position: 'absolute',
+                inset: 6,
+                borderRadius: '50%',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.2)',
+              }}>
+                <HiOutlineDocumentDownload style={{ fontSize: 36, color: 'var(--accent-primary)' }} className="animate-pulse" />
+              </div>
+            </div>
+
+            {/* Progress Percent */}
+            <div style={{ fontSize: '3rem', fontWeight: 800, fontFamily: 'var(--font-display)', color: 'var(--text-primary)', marginBottom: 8, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums', zIndex: 1 }}>
+              {Math.round(progress)}%
+            </div>
+
+            {/* Title Label */}
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8, zIndex: 1 }}>
+              {progressLabel || 'Generating Certificates'}
+            </h2>
+
+            {/* Sublabel detail */}
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: 32, maxWidth: 320, zIndex: 1, minHeight: '20px' }}>
+              {progressSublabel || 'Please wait while we prepare your files'}
+            </p>
+
+            {/* Glowing custom progress bar */}
+            <div style={{ width: '100%', zIndex: 1 }}>
+              <div className="progress-bar" style={{ height: 8, background: 'var(--bg-secondary)', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3)', border: '1px solid var(--border-subtle)' }}>
+                <div
+                  className="progress-bar-fill progress-bar-shimmer"
+                  style={{
+                    width: `${progress}%`,
+                    height: '100%',
+                    transition: 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                    boxShadow: '0 0 12px var(--accent-primary)',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Safety info */}
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 24, zIndex: 1 }}>
+              Do not refresh or close this tab. Processing runs on the server.
+            </p>
           </div>
         ) : (
           /* ═══════════════════════════════════════════
@@ -471,13 +601,9 @@ export default function CsvUploadPage() {
                   </div>
                 )}
 
-                {generating && (
-                  <ProgressBar progress={progress} label="Generating certificates..." />
-                )}
-
                 <button
                   onClick={handleGenerate}
-                  disabled={!csvData || csvData.length === 0 || generating}
+                  disabled={!csvData || csvData.length === 0}
                   className="btn-primary"
                   style={{
                     width: '100%', padding: '14px 24px',
@@ -485,7 +611,7 @@ export default function CsvUploadPage() {
                   }}
                 >
                   <HiOutlineDocumentDownload style={{ fontSize: 18 }} />
-                  {generating ? 'Processing...' : `Generate ${csvData ? csvData.length : 0} Certificate${csvData?.length !== 1 ? 's' : ''}`}
+                  Generate {csvData ? csvData.length : 0} Certificate{csvData?.length !== 1 ? 's' : ''}
                 </button>
               </div>
             </div>
