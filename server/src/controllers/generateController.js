@@ -14,7 +14,7 @@ const tempDir = path.resolve(__dirname, '../../temp');
 const jobs = new Map();
 
 // Batch size — process this many certificates at a time before freeing memory
-const BATCH_SIZE = 10;
+const BATCH_SIZE = 5;
 
 // Auto-cleanup after 10 minutes
 const CLEANUP_DELAY_MS = 10 * 60 * 1000;
