@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import { renderCertificatePNG, renderCertificatePDF } from '../services/renderEngine.js';
+import { renderCertificatePNG, renderCertificatePDF, preloadTemplateImage } from '../services/renderEngine.js';
 import archiver from 'archiver';
 import { randomUUID } from 'crypto';
 import fs from 'fs';
@@ -187,8 +187,20 @@ async function processJob(job, templateFile, fields, dataRows, outputFormat, tem
 
     archive.pipe(outputStream);
 
-    const renderer = outputFormat === 'pdf' ? renderCertificatePDF : renderCertificatePNG;
     const ext = outputFormat === 'pdf' ? 'pdf' : 'png';
+
+    // Pre-load the template image ONCE for PNG rendering to avoid
+    // re-allocating native Cairo surfaces on every certificate
+    let preloadedImg = null;
+    let templateBuffer = templateFile.buffer;
+    const templateMimetype = templateFile.mimetype;
+
+    if (outputFormat !== 'pdf') {
+      preloadedImg = await preloadTemplateImage(templateBuffer);
+      // Free the raw template buffer now — we have the decoded image in memory
+      templateBuffer = null;
+    }
+    templateFile.buffer = null;
 
     // Process in batches to control memory
     for (let batchStart = 0; batchStart < dataRows.length; batchStart += BATCH_SIZE) {
@@ -205,9 +217,9 @@ async function processJob(job, templateFile, fields, dataRows, outputFormat, tem
         try {
           let certBuffer;
           if (outputFormat === 'pdf') {
-            certBuffer = await renderCertificatePDF(templateFile.buffer, templateFile.mimetype, fields, rowData, templateWidth, templateHeight);
+            certBuffer = await renderCertificatePDF(templateBuffer, templateMimetype, fields, rowData, templateWidth, templateHeight);
           } else {
-            certBuffer = await renderCertificatePNG(templateFile.buffer, fields, rowData, templateWidth, templateHeight);
+            certBuffer = await renderCertificatePNG(preloadedImg, fields, rowData, templateWidth, templateHeight);
           }
 
           archive.append(certBuffer, { name: `${filenameBase}.${ext}` });
@@ -230,9 +242,19 @@ async function processJob(job, templateFile, fields, dataRows, outputFormat, tem
         dataRows[i] = null;
       }
 
+      // Force garbage collection to reclaim native canvas memory
+      if (global.gc) {
+        global.gc();
+      }
+
       // Give the event loop a breath between batches
       await new Promise(resolve => setImmediate(resolve));
     }
+
+    // Release template references before finalizing
+    preloadedImg = null;
+    templateBuffer = null;
+    if (global.gc) global.gc();
 
     // Finalize the archive
     await archive.finalize();

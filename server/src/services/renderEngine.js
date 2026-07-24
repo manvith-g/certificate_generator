@@ -94,11 +94,22 @@ export function initFonts() {
 }
 
 /**
- * Render a single certificate as PNG using node-canvas.
+ * Pre-load a template image buffer into a reusable canvas Image object.
+ * Call this once per job, then pass the returned image to renderCertificatePNG.
  */
-export async function renderCertificatePNG(templateBuffer, fields, participantData, templateWidth, templateHeight) {
-  // Load template image from buffer
-  const img = await loadImage(templateBuffer);
+export async function preloadTemplateImage(templateBuffer) {
+  return await loadImage(templateBuffer);
+}
+
+/**
+ * Render a single certificate as PNG using node-canvas.
+ * @param {Image|Buffer} templateImageOrBuffer - A preloaded Image object (preferred) or raw Buffer.
+ */
+export async function renderCertificatePNG(templateImageOrBuffer, fields, participantData, templateWidth, templateHeight) {
+  // Use the preloaded image directly, or fall back to loading from buffer
+  const img = (templateImageOrBuffer instanceof Buffer)
+    ? await loadImage(templateImageOrBuffer)
+    : templateImageOrBuffer;
   const width = templateWidth || img.width;
   const height = templateHeight || img.height;
   

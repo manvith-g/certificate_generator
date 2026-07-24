@@ -5,7 +5,7 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node --expose-gc --max-old-space-size=350 --optimize_for_size server.js",
     "dev": "nodemon server.js"
   },
   "keywords": [],
